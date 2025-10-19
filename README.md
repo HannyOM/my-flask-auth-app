@@ -1,1 +1,1 @@
-# my-flask-auth-app
+# Flask Authentication App
