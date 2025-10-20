@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager, UserMixin, current_user
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -58,16 +58,17 @@ def login():
             password_correct = bcrypt.check_password_hash(user.password, password)
             if password_correct:
             # Implement session management here (e.g., Flask-Login)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('dashboard', username=username))
             else:
                 return render_template("login_details_incorrect.html")
         else:
             return render_template("login_details_incorrect.html")
     return render_template("login.html")
 
-@app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html")
+@app.route("/dashboard/<string:username>")
+def dashboard(username):
+    user = User.query.filter_by(username=username).first()
+    return render_template("dashboard.html", user=user)
 
 if __name__ == "__main__":
     with app.app_context():
