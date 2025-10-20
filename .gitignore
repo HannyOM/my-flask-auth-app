@@ -1,0 +1,6 @@
+# Ignoring virtual environment
+/virtual_env
+
+# Ignoring database
+/instance
+
