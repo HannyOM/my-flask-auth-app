@@ -33,4 +33,4 @@ You should have installed:
 
 ## Suggestions for Improvement:
 
-COMING SOON
+1. Utilize flask.session to ensure only one user can be logged in at a time.
