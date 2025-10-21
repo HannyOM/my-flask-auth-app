@@ -1,29 +1,36 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-app.secret_key = "aed6c9be02818d13f2f60a61f33cf1fa0e40edd7a6db6ac9eca7962debc84a41"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = "aed6c9be02818d13f2f60a61f33cf1fa0e40edd7a6db6ac9eca7962debc84a41"
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login"
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+    # def __init__(self, username, password):
+    #     self.username = username
+    #     self.password = password
+
+with app.app_context():
+        db.create_all()
+    
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route("/")
 def index():
@@ -44,7 +51,6 @@ def register():
                 new_user = User(username=username, password=password_hash)
                 db.session.add(new_user)
                 db.session.commit()
-                flash('Your account has been created! You are now able to log in.', 'success')
                 return redirect(url_for("login")) 
     return render_template("register.html")
 
@@ -55,22 +61,24 @@ def login():
         password = request.form.get("password")
         user = User.query.filter_by(username=username).first()
         if user:
-            password_correct = bcrypt.check_password_hash(user.password, password)
+            password_correct = bcrypt.check_password_hash(user.password, password) 
             if password_correct:
-            # Implement session management here (e.g., Flask-Login)
+                login_user(user)
                 return redirect(url_for('dashboard'))
-            else:
-                return render_template("login_details_incorrect.html")
         else:
             return render_template("login_details_incorrect.html")
     return render_template("login.html")
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", username=current_user.username)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-
     app.run(debug=True)
