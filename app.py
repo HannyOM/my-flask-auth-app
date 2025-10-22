@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -10,23 +10,17 @@ app.config["SECRET_KEY"] = "aed6c9be02818d13f2f60a61f33cf1fa0e40edd7a6db6ac9eca7
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = "login"
-
+login_manager.login_view = "login" # type: ignore
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
-    # def __init__(self, username, password):
-    #     self.username = username
-    #     self.password = password
-
 with app.app_context():
-        db.create_all()
+    db.create_all()
     
 @login_manager.user_loader
 def load_user(user_id):
@@ -48,7 +42,7 @@ def register():
                 return render_template("username_already_taken.html")
             else:    
                 password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-                new_user = User(username=username, password=password_hash)
+                new_user = User(username=username, password=password_hash) # type: ignore
                 db.session.add(new_user)
                 db.session.commit()
                 return redirect(url_for("login")) 
@@ -59,12 +53,15 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        user = User.query.filter_by(username=username).first()
-        if user:
-            password_correct = bcrypt.check_password_hash(user.password, password) 
-            if password_correct:
-                login_user(user)
-                return redirect(url_for('dashboard'))
+        if username and password:
+            user = User.query.filter_by(username=username).first()
+            if user:
+                password_correct = bcrypt.check_password_hash(user.password, password) 
+                if password_correct:
+                    login_user(user)
+                    return redirect(url_for('dashboard'))
+                else:
+                    return render_template("login_details_incorrect.html")
         else:
             return render_template("login_details_incorrect.html")
     return render_template("login.html")
