@@ -5,12 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
 </head>
 
 <body>
-    <a href="{{url_for('login')}}">Login</a>
-    <br>
-    <a href="{{url_for('register')}}">Register</a>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <div class="ui placeholder raised segment" style="width: 75%;">
+            <div class="ui two column very relaxed stackable grid">
+
+                <div class="middle aligned column">
+                    <a href="{{url_for('login')}}">
+                        <div class="ui big button">
+                            Login
+                        </div>
+                    </a>
+                </div>
+
+                <div class="middle aligned column">
+                    <a href="{{url_for('register')}}">
+                        <div class="ui big button">
+                            <i class="signup icon"></i>
+                            Register
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="ui vertical divider">
+                Or
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -5,10 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
 </head>
 
 <body>
-    <p>Login details incorrect <a href="{{ url_for('login') }}">Try again.</a>👍</p>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <div class="ui raised segment">
+            <div class="ui medium header">
+                Login details incorrect! <a href="{{ url_for('login') }}">Try again</a>👍
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
